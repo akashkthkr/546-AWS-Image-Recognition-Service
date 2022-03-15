@@ -31,18 +31,20 @@ def create_key_pair():
         print("Unexpected error: %s" % e)
     
 
-def create_instance(key_name, sec_group_ids=["sg-0bb98ead470e1d287"], instance_type='t2.micro', min_count=1, max_count=1):
+def create_instance(sec_group_ids=["sg-0bb98ead470e1d287"], instance_type='t2.micro', min_count=1, max_count=1):
+  try:
     logging.debug("Creating new instance")
     instance = ec2_res.create_instances(
         ImageId=AMI,
         MinCount=min_count,
         MaxCount=max_count,
         InstanceType=instance_type,
-        KeyName=key_name,
         SecurityGroupIds=sec_group_ids,
         UserData=USER_DATA
     )
     logging.debug("Instance created id:", instance["Instances"][0]["InstanceId"])
+  except ClientError as e:
+    print("Unexpected error: %s" % e)
 
 def stop_instances(instance_ids):
     logging.debug("Stopping instance:", instance_ids)
@@ -99,4 +101,4 @@ def get_instances_by_state(state = ['running']):
 #     auto_scale_instances()
 #     time.sleep(30)
 
-get_instances_by_state()
+create_instance()
