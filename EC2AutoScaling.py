@@ -111,19 +111,21 @@ def auto_scale_instances():
             return
         # scale up
         if number_of_running_instances < queue_length:
-            more_instances_required = min(queue_length - number_of_running_instances, MAX_LIMIT_INSTANCES)
-            logging.debug("Number of more_instances_required %s", more_instances_required)
+            total_instances_to_spawn = min(queue_length - number_of_running_instances, MAX_LIMIT_INSTANCES)
+            logging.debug("Number of total_instances_to_spawn %s", total_instances_to_spawn)
             stopped_instances_id_list = get_instances_by_state(['stopped'])
             num_of_stopped_instances = len(stopped_instances_id_list)
+            logging.debug("Number of stopped_instances %s", num_of_stopped_instances)
             
             new_instances_required = 0
-            if more_instances_required - num_of_stopped_instances > 0:
-              new_instances_required = more_instances_required - num_of_stopped_instances
+            if total_instances_to_spawn - num_of_stopped_instances > 0:
+              new_instances_required = total_instances_to_spawn - num_of_stopped_instances
             # Start the stopped instances, if any
             if num_of_stopped_instances > 0:
               ec2_client.start_instances(InstanceIds=stopped_instances_id_list)
             # Start remainder new instances
             if new_instances_required > 0:
+              logging.debug(" Starting %s new instances", new_instances_required)
               create_instance(min_count=new_instances_required, max_count=new_instances_required)
             
 # while True:
