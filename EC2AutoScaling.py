@@ -52,6 +52,7 @@ def get_instances_by_state(state = ['running']):
         }
     ]
     instances = ec2_res.instances.filter(Filters=filters)
+    logging.debug(instances[0].id)
     return [instance.id for instance in instances]
 
 # def auto_scale_instances():
