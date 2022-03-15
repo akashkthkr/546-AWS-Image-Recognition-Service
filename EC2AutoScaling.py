@@ -3,6 +3,7 @@ import logging
 import SQSManagement
 import time, os
 import constants
+from botocore.exceptions import ClientError
 
 AMI = "ami-0a55e620aa5c79a24"
 MAX_LIMIT_INSTANCES = 19
@@ -15,11 +16,18 @@ ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
 ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME)
 
 def create_key_pair():
-  key_pair = ec2_client.create_key_pair(KeyName=EC2_KEY_NAME)
-  private_key = key_pair["KeyMaterial"]
-  # write private key to file with 400 permissions
-  with os.fdopen(os.open("/tmp/aws_ec2_key.pem", os.O_WRONLY | os.O_CREAT, 0o400), "w+") as handle:
-    handle.write(private_key)
+  try:
+    key_pair = ec2_client.create_key_pair(KeyName=EC2_KEY_NAME)
+    private_key = key_pair["KeyMaterial"]
+    # write private key to file with 400 permissions
+    with os.fdopen(os.open("/tmp/aws_ec2_key.pem", os.O_WRONLY | os.O_CREAT, 0o400), "w+") as handle:
+      handle.write(private_key)
+  except ClientError as e:
+    if e.response['Error']['Code'] == 'EntityAlreadyExists':
+      print("Key pair already exists")
+    else:
+        print("Unexpected error: %s" % e)
+    
 
 def create_instance(key_name, sec_group_ids=["sg-0bb98ead470e1d287"], instance_type='t2.micro', min_count=1, max_count=1):
     logging.debug("Creating new instance")
@@ -88,6 +96,4 @@ def get_instances_by_state(state = ['running']):
 #     auto_scale_instances()
 #     time.sleep(30)
 
-
-create_key_pair()
 get_instances_by_state()
