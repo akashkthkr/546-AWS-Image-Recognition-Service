@@ -11,7 +11,7 @@ USER_DATA = f"""#!bin/bash
 yum update -y
 yum install git -y
 """
-ec2_client = boto3.client('ec2', region_name="us-east-1")
+ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
 ec2_res = boto3.resource('ec2')
 
 def create_key_pair():

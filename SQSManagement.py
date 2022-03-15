@@ -1,10 +1,12 @@
+from asyncio import constants
 import boto3
 import logging
+import constants
 
 REQUEST_QUEUE_NAME = "images-requests"
 RESPONSE_QUEUE_NAME = "images-response"
 
-client = boto3.client('sqs')
+client = boto3.client('sqs', region_name=constants.REGION_NAME)
 
 def create_SQS_queue(SQS_QUEUE_NAME=REQUEST_QUEUE_NAME):
     try:
