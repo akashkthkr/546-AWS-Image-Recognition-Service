@@ -5,6 +5,8 @@ import time, os
 import constants
 from botocore.exceptions import ClientError
 
+logging.basicConfig(filename='ec2AutoScaling.log', format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
+
 AMI = "ami-0a55e620aa5c79a24"
 MAX_LIMIT_INSTANCES = 19
 EC2_KEY_NAME = "ec2-key-pair"
@@ -12,8 +14,8 @@ USER_DATA = f"""#!bin/bash
 yum update -y
 yum install git -y
 """
-ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
-ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME)
+ec2_client = boto3.client('ec2', region_name="us-east-1")
+ec2_res = boto3.resource('ec2',region_name="us-east-1")
 
 def create_key_pair():
   try:
