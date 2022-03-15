@@ -60,7 +60,7 @@ def create_instance(min_count=1, max_count=1):
         UserData=USER_DATA
     )
     for instance in instances:
-      ec2_res.create_tags(Resources=[instance[0].id], Tags=[
+      ec2_res.create_tags(Resources=[instance.id], Tags=[
           {
               'Key': 'Name',
               'Value': "app-instance1",
@@ -86,8 +86,8 @@ def get_instances_by_state(state = ['running']):
           'Values': state
         }, 
         {
-          'Name': 'ImageId',
-           'Values': state
+          'Name': 'image-id',
+          'Values': [constants.APP_TIER_AMI]
         }
     ]
     instances = ec2_res.instances.filter(Filters=filters)
@@ -97,7 +97,7 @@ def get_instances_by_state(state = ['running']):
 
 def auto_scale_instances():
     queue_length = 3#SQSManagement.numberOfMessagesInQueue()
-    logging.debug("Request queue length:", queue_length)
+    logging.debug("Request queue length: %s", queue_length)
 
     if queue_length == 0:
         logging.debug("No Request in queue ****SCALE IN****, stopping all instances")
@@ -105,13 +105,14 @@ def auto_scale_instances():
         stop_instances(get_instances_by_state())
     else: 
         number_of_running_instances = len(get_instances_by_state())
-        logging.debug("Number of running instances:", number_of_running_instances)
+        logging.debug("Number of running instances: %s", number_of_running_instances)
         if number_of_running_instances >= MAX_LIMIT_INSTANCES:
             logging.debug("Infra at MAX CAPACITY %s, can not scale out", MAX_LIMIT_INSTANCES)
             return
         # scale up
         if number_of_running_instances < queue_length:
             more_instances_required = min(queue_length - number_of_running_instances, MAX_LIMIT_INSTANCES)
+            logging.debug("more_instances_required %s", more_instances_required)
             stopped_instances_id_list = get_instances_by_state(['stopped'])
             num_of_stopped_instances = len(stopped_instances_id_list)
             
