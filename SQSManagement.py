@@ -1,7 +1,7 @@
 import boto3
 
 client = boto3.client('sqs')
-QUEUE_NAME="images-requests-1"
+QUEUE_NAME = "images-requests-1"
 
 def create_SQS_queue(SQS_QUEUE_NAME=QUEUE_NAME):
     try:
@@ -10,7 +10,7 @@ def create_SQS_queue(SQS_QUEUE_NAME=QUEUE_NAME):
             Attributes = { 
                 'DelaySeconds':'15',
                 'MaximumMessageSize':'262144',
-                'VisibilityTimeout':'3600',
+                'VisibilityTimeout':'60',
                 'MessageRetentionPeriod':'86400'
             }     
         )
@@ -55,5 +55,14 @@ def send_message():
     MessageGroupId='string'
   )
   print(response.get('MessageId'))
-        
+
+def numberOfMessagesInSQS():
+    response = client.get_queue_attributes(
+    QueueUrl='string',
+    AttributeNames=[
+        'All'|'Policy'|'VisibilityTimeout'|'MaximumMessageSize'|'MessageRetentionPeriod'|'ApproximateNumberOfMessages'|'ApproximateNumberOfMessagesNotVisible'|'CreatedTimestamp'|'LastModifiedTimestamp'|'QueueArn'|'ApproximateNumberOfMessagesDelayed'|'DelaySeconds',
+        ]
+    )
+    return int(response.ApproximateNumberOfMessages)
+
 create_SQS_queue()

@@ -1,6 +1,7 @@
 from flask import Flask, render_template , request , jsonify
 from PIL import Image
 import base64
+import SQSManagement
 
 from logging.config import dictConfig
 
