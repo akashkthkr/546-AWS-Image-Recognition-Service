@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError
 logging.basicConfig(filename='ec2AutoScaling.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 
 AMI = "ami-0a55e620aa5c79a24"
-MAX_LIMIT_INSTANCES = 19
+MAX_LIMIT_INSTANCES = 3
 EC2_KEY_NAME = "ec2-key-pair"
 USER_DATA = f"""#!bin/bash
 yum update -y
@@ -51,26 +51,21 @@ def create_security_group():
 def create_instance(min_count=1, max_count=1):
   try:
     logging.debug("Creating new instance")
-    instance = ec2_res.create_instances(
-        ImageId=AMI,
+    instances = ec2_res.create_instances(
+        ImageId=constants.APP_TIER_AMI,
         MinCount=min_count,
         MaxCount=max_count,
         InstanceType=constants.INSTANCE_TYPE,
         SecurityGroupIds=constants.SECURITY_GROUP_ID,
-        UserData=USER_DATA,
-        TagSpecifications=[
-        {
-            'ResourceType': 'capacity-reservation',
-            'Tags': [
-                {
-                    'Key': 'Name',
-                    'Value': 'app-tier-'
-                },
-            ]
-        },
-    ],
+        UserData=USER_DATA
     )
-    logging.debug("Instance created id:", instance["Instances"][0]["InstanceId"])
+    for instance in instances:
+      ec2_res.create_tags(Resources=[instance[0].id], Tags=[
+          {
+              'Key': 'Name',
+              'Value': "app-instance1",
+          },
+      ])
   except ClientError as e:
     print("Unexpected error: %s" % e)
 
@@ -89,6 +84,10 @@ def get_instances_by_state(state = ['running']):
         {
           'Name': 'instance-state-name', 
           'Values': state
+        }, 
+        {
+          'Name': 'ImageId',
+           'Values': state
         }
     ]
     instances = ec2_res.instances.filter(Filters=filters)
@@ -96,37 +95,37 @@ def get_instances_by_state(state = ['running']):
       logging.debug(instance.id)
     return [instance.id for instance in instances]
 
-# def auto_scale_instances():
-#     queue_length = SQSManagement.numberOfMessagesInQueue()
-#     logging.debug("Request queue length:", queue_length)
+def auto_scale_instances():
+    queue_length = 3#SQSManagement.numberOfMessagesInQueue()
+    logging.debug("Request queue length:", queue_length)
 
-#     if queue_length == 0:
-#         logging.debug("No Request in queue ****SCALE IN****, stopping all instances")
-#         # make sure the instance is idle and do not stop if it is currenlty processing a request
-#         stop_instances(get_instances_by_state())
-#     else: 
-#         number_of_running_instances = len(get_instances_by_state())
-#         logging.debug("Number of running instances:", number_of_running_instances)
-#         if number_of_running_instances >= MAX_LIMIT_INSTANCES:
-#             logging.debug("Infra at MAX CAPACITY %s, can not scale out", MAX_LIMIT_INSTANCES)
-#             return
-#         # scale up
-#         if number_of_running_instances < queue_length:
-#             more_instances_required = min(queue_length - number_of_running_instances, MAX_LIMIT_INSTANCES)
-#             num_of_stopped_instances = len(get_instances_by_state(['stopped']))
-#             new_instances_required = 0
-#             if more_instances_required - num_of_stopped_instances > 0:
-#               new_instances_required = more_instances_required - num_of_stopped_instances
-             
-#             # Start the stopped instances
+    if queue_length == 0:
+        logging.debug("No Request in queue ****SCALE IN****, stopping all instances")
+        # make sure the instance is idle and do not stop if it is currenlty processing a request
+        stop_instances(get_instances_by_state())
+    else: 
+        number_of_running_instances = len(get_instances_by_state())
+        logging.debug("Number of running instances:", number_of_running_instances)
+        if number_of_running_instances >= MAX_LIMIT_INSTANCES:
+            logging.debug("Infra at MAX CAPACITY %s, can not scale out", MAX_LIMIT_INSTANCES)
+            return
+        # scale up
+        if number_of_running_instances < queue_length:
+            more_instances_required = min(queue_length - number_of_running_instances, MAX_LIMIT_INSTANCES)
+            stopped_instances_id_list = get_instances_by_state(['stopped'])
+            num_of_stopped_instances = len(stopped_instances_id_list)
             
-#             # Start remainder new insrance
-#             if new_instances_required>0:
-#               create_instance()
+            new_instances_required = 0
+            if more_instances_required - num_of_stopped_instances > 0:
+              new_instances_required = more_instances_required - num_of_stopped_instances
+             
+            # Start the stopped instances
+            ec2_client.start_instances(InstanceIds=stopped_instances_id_list)
+            # Start remainder new instances
+            if new_instances_required>0:
+              create_instance(min_count=new_instances_required, max_count=new_instances_required)
             
 # while True:
 #     logging.debug("starting auto scaling")
 #     auto_scale_instances()
 #     time.sleep(30)
-
-create_instance()
