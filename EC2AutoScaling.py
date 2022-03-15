@@ -12,7 +12,7 @@ yum update -y
 yum install git -y
 """
 ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
-ec2_res = boto3.resource('ec2')
+ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME)
 
 def create_key_pair():
   key_pair = ec2_client.create_key_pair(KeyName=EC2_KEY_NAME)
