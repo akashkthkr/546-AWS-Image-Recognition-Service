@@ -130,5 +130,5 @@ def auto_scale_instances():
             
 # while True:
 #     logging.debug("starting auto scaling")
-#     auto_scale_instances()
+auto_scale_instances()
 #     time.sleep(30)
