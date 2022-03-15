@@ -33,7 +33,6 @@ def webTier():
     # task_cb.start()
 	return jsonify({'key':str(key), 'value': str(value)})
 
-
 @app.route("/")
 def main():
     app.logger.debug("debug")
