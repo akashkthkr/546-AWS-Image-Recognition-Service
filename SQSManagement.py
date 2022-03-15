@@ -2,6 +2,7 @@ from asyncio import constants
 import boto3
 import logging
 import constants
+from botocore.exceptions import ClientError
 
 REQUEST_QUEUE_NAME = "images-requests"
 RESPONSE_QUEUE_NAME = "images-response"
