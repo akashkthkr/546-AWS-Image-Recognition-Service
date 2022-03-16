@@ -93,7 +93,7 @@ def shutting_down_instances():
 def get_image_after_decoding_base64(msg_value):
     return base64.decodestring(msg_value)
 
-
+# this one is to be checked and completed
 def get_output_from_classification(image_file_jpg):
     return None
 
