@@ -4,8 +4,8 @@ import logging
 import constants
 from botocore.exceptions import ClientError
 
-REQUEST_QUEUE_NAME = "images-requests"
-RESPONSE_QUEUE_NAME = "images-response"
+REQUEST_QUEUE_NAME = constants.AWS_SQS_REQUEST_QUEUE_NAME
+RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 
 client = boto3.client('sqs', region_name=constants.REGION_NAME)
 
