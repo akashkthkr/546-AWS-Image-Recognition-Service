@@ -7,13 +7,13 @@ pip3 install -r requirements.txt
 ### Web Tier IP and ssh Details
 
 ### Resources Used in AWS as Naming:
-SQS REQUEST_QUEUE_NAME = "images-requests"
+AWS_S3_INPUT_BUCKET_NAME = "input-bucket"
 
-SQS RESPONSE_QUEUE_NAME = "images-response"
+AWS_S3_OUTPUT_BUCKET_NAME = "output-bucket"
 
-S3 Input Bucket Name: cc-pr1-input
+AWS_SQS_REQUEST_QUEUE_NAME = "images-requests"
 
-S3 Output Bucket Name: cc-pr1-output
+AWS_SQS_RESPONSE_QUEUE_NAME = "images-response"
 
 
 ### Team Members:
