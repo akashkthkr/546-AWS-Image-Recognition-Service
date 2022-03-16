@@ -6,8 +6,6 @@ import constants
 from botocore.exceptions import ClientError
 
 logging.basicConfig(filename='ec2AutoScaling.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
-
-AMI = "ami-0a55e620aa5c79a24"
 MAX_LIMIT_INSTANCES = 3
 EC2_KEY_NAME = "ec2-key-pair"
 USER_DATA = f"""#!bin/bash
@@ -127,8 +125,13 @@ def auto_scale_instances():
             if new_instances_required > 0:
               logging.debug(" Starting %s new instances", new_instances_required)
               create_instance(min_count=new_instances_required, max_count=new_instances_required)
+        # scale down
+        if number_of_running_instances > queue_length:
+        # stop half of the instances
+          return
             
-# while True:
-#     logging.debug("starting auto scaling")
-auto_scale_instances()
-#     time.sleep(30)
+while True:
+    # test commit
+    logging.debug("starting auto scaling")
+    auto_scale_instances()
+    time.sleep(10)
