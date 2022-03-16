@@ -29,39 +29,11 @@ def create_SQS_queue(SQS_QUEUE_NAME=REQUEST_QUEUE_NAME):
 def get_queue_url(queue_name=REQUEST_QUEUE_NAME):
     return client.get_queue_url(QueueName=queue_name)['QueueUrl']
 
-def send_message():
+def send_message(queueUrl, msg):
     response = client.send_message(
-        QueueUrl='string',
-        MessageBody='string',
-        DelaySeconds=123,
-        MessageAttributes={
-            'string': {
-                'StringValue': 'string',
-                'BinaryValue': b'bytes',
-                'StringListValues': [
-                    'string',
-                ],
-                'BinaryListValues': [
-                    b'bytes',
-                ],
-                'DataType': 'string'
-            }
-        },
-        MessageSystemAttributes={
-            'string': {
-                'StringValue': 'string',
-                'BinaryValue': b'bytes',
-                'StringListValues': [
-                    'string',
-                ],
-                'BinaryListValues': [
-                    b'bytes',
-                ],
-                'DataType': 'string'
-            }
-        },
-        MessageDeduplicationId='string',
-        MessageGroupId='string'
+        QueueUrl = queueUrl,
+        MessageBody = msg,
+        DelaySeconds = 123,
     )
     logging.debug(response.get('MessageId'))
 
