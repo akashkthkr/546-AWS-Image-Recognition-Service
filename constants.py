@@ -6,3 +6,19 @@ AWS_S3_INPUT_BUCKET_NAME = "input-bucket"
 AWS_S3_OUTPUT_BUCKET_NAME = "output-bucket"
 AWS_SQS_REQUEST_QUEUE_NAME = "images-requests"
 AWS_SQS_RESPONSE_QUEUE_NAME = "images-responses"
+
+## SWAG
+STARTUP_BANNER =f"""
+ +-+ +-+ +-+ +-+ +-+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+ |C| |l| |o| |u| |d|   |c| |o| |m| |p| |u| |t| |i| |n| |g|
+ +-+ +-+ +-+ +-+ +-+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+
+"""
+
+STARTUP_BANNER_GROUP = f"""
+  _______ .______        ______    __    __  .______       __   __  
+ /  _____||   _  \      /  __  \  |  |  |  | |   _  \     /_ | /_ | 
+|  |  __  |  |_)  |    |  |  |  | |  |  |  | |  |_)  |     | |  | | 
+|  | |_ | |      /     |  |  |  | |  |  |  | |   ___/      | |  | | 
+|  |__| | |  |\  \----.|  `--'  | |  `--'  | |  |          | |  | | 
+ \______| | _| `._____| \______/   \______/  | _|          |_|  |_| 
+"""

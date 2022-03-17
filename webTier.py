@@ -49,4 +49,6 @@ def healthcheck():
   return "200"
 
 if __name__ == '__main__':
+    app.logger.info(constants.STARTUP_BANNER)
+    app.logger.info(constants.STARTUP_BANNER_GROUP)
     app.run(host='0.0.0.0', debug=True, port=6060)
