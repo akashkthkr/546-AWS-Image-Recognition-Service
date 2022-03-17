@@ -83,7 +83,7 @@ def store_image_to_s3(file_name, bucket_name, image_file):
 
 
 def write_to_file(image_name, result):
-    with open(image_name, "wb") as f:
+    with open(image_name, "rb") as f:
         f.write(bytes(result, 'utf8'))
         f.close()
 
@@ -102,8 +102,17 @@ def shutting_down_instances():
     return None
 
 
-def get_image_after_decoding_base64(msg_value):
-    return base64.b64decode(msg_value)
+def get_image_after_decoding_base64(msg_filename_key, msg_value):
+    with open('encode.bin', "wb") as file:
+        file.write(msg_value)
+    file = open('encode.bin', 'rb')
+    byte = file.read()
+    file.close()
+    decodeit = open(msg_filename_key, 'wb')
+    decodeit.write(base64.b64decode((byte)))
+    decodeit.close()
+    os.remove("encode.bin")
+
 
 # this one is to be checked and completed
 def get_output_from_classification(image_file_jpg):
@@ -128,13 +137,13 @@ if __name__ == '__main__':
         msg_base64_encoded_value = payload.get('value')
         print("msg_base64_encoded_value :" + msg_base64_encoded_value)
         transient_binary_file = msg_filename_key
-        image_file_jpg = get_image_after_decoding_base64(msg_base64_encoded_value)
+        get_image_after_decoding_base64(msg_filename_key, msg_base64_encoded_value)
         classified_predicted_result = "test" #get_output_from_classification(image_file_jpg)
         key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
         print("key_value_pair_predicted :" + key_value_pair_predicted)
-        write_to_file(transient_binary_file, key_value_pair_predicted)
-        store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, image_file_jpg)
-        print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file )
+        # write_to_file(transient_binary_file, key_value_pair_predicted)
+        store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, msg_filename_key)
+        print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file)
         save_result_file_into_bucket(transient_binary_file, S3_OUTPUT_BUCKET, transient_binary_file)
         os.remove(transient_binary_file)
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), msg_filename_key)
