@@ -22,8 +22,14 @@ SQS_RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 sqs_management_instance = SQSManagement()
 ec2_auto_scale_instance = EC2AutoScaling()
 
-app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
-app_sqs_client = boto3.client('sqs', region_name=constants.REGION_NAME)
+# app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
+app_sqs_client = boto3.client('sqs', aws_access_key_id= os.environ["AWS_ACCESS_KEY_ID"],
+                              aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+                              region_name=constants.REGION_NAME)
+
+s3_client = boto3.client('s3', aws_access_key_id= os.environ["AWS_ACCESS_KEY_ID"],
+                         aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+                         region_name=constants.REGION_NAME)
 
 response_queue_url = sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME)
 request_queue_url = sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME)
@@ -67,7 +73,7 @@ def delete_message_request(queue_url, receipt_handle):
 
 def store_image_to_s3(file_name, bucket_name, image_file):
     try:
-        s3_client = boto3.client('s3')
+        # s3_client = boto3.client('s3')
         response = s3_client.upload_file(file_name, bucket_name, image_file)
         print("image_loaded")
     except ClientError as e:
@@ -82,7 +88,7 @@ def write_to_file(image_name, result):
 
 def save_result_file_into_bucket(file_name, bucket_name, object_name):
     try:
-        s3_client = boto3.client('s3')
+        # s3_client = boto3.client('s3')
         response = s3_client.upload_file(file_name, bucket_name, object_name)
     except ClientError as e:
         logging.error(e)
