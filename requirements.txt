@@ -4,4 +4,3 @@ quart
 Pillow
 botocore
 requests
-subprocess

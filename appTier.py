@@ -107,7 +107,6 @@ def get_output_from_classification(image_file_jpg):
 
 def running_app_tier():
     while True:
-        ec2_auto_scale_instance.auto_scale_instances()
         if sqs_management_instance.numberOfMessagesInQueue(SQS_RESPONSE_QUEUE_NAME):
             break
         message = get_message(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME))
