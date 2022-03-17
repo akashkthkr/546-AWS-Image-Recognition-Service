@@ -49,7 +49,7 @@ def create_security_group():
 
 def create_instance(min_count=1, max_count=1):
     try:
-        logging.debug("Creating new instance")
+        logging.debug("Creating %s new instance(s)", max_count)
         instances = ec2_res.create_instances(
             ImageId=constants.APP_TIER_AMI,
             MinCount=min_count,
@@ -80,7 +80,7 @@ def terminate_instance(instance_ids):
     logging.debug(response)
 
 
-def get_instances_by_state(state=['running', 'stopped']):
+def get_instances_by_state(state=['running']):
     filters = [
         {
             'Name': 'instance-state-name',
@@ -140,8 +140,8 @@ def auto_scale_instances():
             return
 
 while True:
-    # test commit
-    logging.debug("starting auto scaling")
+    print(STARTUP_BANNER)
+    logging.debug("*********** Started EC2 auto scaling according to queue length**************")
     #auto_scale_instances()
-    get_instances_by_state()
+    #get_instances_by_state()
     time.sleep(10)

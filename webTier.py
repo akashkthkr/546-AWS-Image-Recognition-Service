@@ -20,21 +20,20 @@ dictConfig({
 REQUEST_QUEUE_NAME = constants.AWS_SQS_REQUEST_QUEUE_NAME
 RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 
+app = Quart(__name__)
+
 async def async_get_data(msg):
     sleep(1)
     return str(msg)
 
-app = Quart(__name__)
-
 @app.route('/classify-image', methods=['POST'])
 async def classify_image():
     file = (await request.files)['myfile']
-    key = str(file.filename)
     value = base64.b64encode(file.read())
     value = str(value, 'utf-8')
 
     # create message
-    json_msg = json.dumps({'key': key, 'value': value})
+    json_msg = json.dumps({'key': str(file.filename), 'value': value})
     app.logger.debug("Request processed with payload %s", json_msg)
 
     # send message to SQS
