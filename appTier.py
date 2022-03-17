@@ -111,7 +111,7 @@ def get_output_from_classification(image_file_jpg):
     return classification_predicted_result
 
 
-def running_app_tier():
+if __name__ == '__main__':
     while True:
         print("running_app_tier start")
         if sqs_management_instance.numberOfMessagesInQueue(SQS_REQUEST_QUEUE_NAME):
@@ -140,8 +140,4 @@ def running_app_tier():
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), msg_filename_key)
         # deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME), message['ReceiptHandle'])
-    return None
-
-if __name__ == '__main__':
-    running_app_tier()
-    shutting_down_instances()
+    # shutting_down_instances()
