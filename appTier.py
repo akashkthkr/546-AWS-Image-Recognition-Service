@@ -19,8 +19,8 @@ SQS_RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 
 # initialization and instantiations
 
-sqs_management_instance = SQSManagement()
-ec2_auto_scale_instance = EC2AutoScaling()
+sqs_management_instance = SQSManagement
+ec2_auto_scale_instance = EC2AutoScaling
 
 # app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
 app_sqs_client = boto3.client('sqs', aws_access_key_id= os.environ["AWS_ACCESS_KEY_ID"],

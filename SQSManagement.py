@@ -40,9 +40,7 @@ def send_message(queueUrl, msg):
 def numberOfMessagesInQueue(queue_name=REQUEST_QUEUE_NAME):
     response = client.get_queue_attributes(
         QueueUrl=get_queue_url(queue_name),
-        AttributeNames=[
-            'All' | 'Policy' | 'VisibilityTimeout' | 'MaximumMessageSize' | 'MessageRetentionPeriod' | 'ApproximateNumberOfMessages' | 'ApproximateNumberOfMessagesNotVisible' | 'CreatedTimestamp',
-        ]
+        AttributeNames=['ApproximateNumberOfMessages']
     )
     logging.debug("numberOfMessagesInQueue %s %s", queue_name, int(response.ApproximateNumberOfMessages))
     return int(response.ApproximateNumberOfMessages)
