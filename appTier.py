@@ -107,7 +107,7 @@ def get_output_from_classification(image_file_jpg):
 
 def running_app_tier():
     while True:
-        if sqs_management_instance.numberOfMessagesInQueue(SQS_RESPONSE_QUEUE_NAME):
+        if sqs_management_instance.numberOfMessagesInQueue(SQS_REQUEST_QUEUE_NAME):
             break
         message = get_message(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME))
         if message is None:
@@ -127,7 +127,7 @@ def running_app_tier():
         print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file )
         save_result_file_into_bucket(transient_binary_file, S3_OUTPUT_BUCKET, transient_binary_file)
         os.remove(transient_binary_file)
-        send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME), msg_filename_key)
+        send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), msg_filename_key)
         # deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME), message['ReceiptHandle'])
     return None
