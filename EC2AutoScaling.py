@@ -12,12 +12,6 @@ USER_DATA = f"""#!bin/bash
 yum update -y
 yum install git -y
 """
-key = os.environ['AWS_ACCESS_KEY_ID']
-secret = os.environ['AWS_SECRET_ACCESS_KEY']
-print("key "+ key)
-print("secret " +secret)
-# ec2_client = boto3.client('ec2', aws_access_key_id=key, aws_secret_access_key=secret,region_name=constants.REGION_NAME)
-# ec2_res = boto3.resource('ec2', aws_access_key_id=key, aws_secret_access_key=secret,region_name=constants.REGION_NAME)
 
 ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
 ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME)
@@ -34,7 +28,6 @@ def create_key_pair():
             print("Key pair already exists")
         else:
             print("Unexpected error: %s" % e)
-
 
 def create_security_group():
     response = ec2_client.create_security_group(
@@ -53,7 +46,6 @@ def create_security_group():
         ],
         DryRun=False
     )
-
 
 def create_instance(min_count=1, max_count=1):
     try:
