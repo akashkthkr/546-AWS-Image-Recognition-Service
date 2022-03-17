@@ -38,8 +38,7 @@ def get_queue_url(queue_name=REQUEST_QUEUE_NAME):
 def send_message(queueUrl, msg):
     response = client.send_message(
         QueueUrl = queueUrl,
-        MessageBody = msg,
-        DelaySeconds = 123,
+        MessageBody = msg
     )
     logging.debug(response.get('MessageId'))
 

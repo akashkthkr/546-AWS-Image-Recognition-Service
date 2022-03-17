@@ -5,6 +5,7 @@ from time import sleep
 import base64
 import asyncio
 import boto3
+import json
 import constants
 from SQSManagement import *
 
@@ -29,7 +30,7 @@ async def webTier():
 
     # create message
     msg = {'key': key, 'value': value}
-    json_msg = jsonify(msg)
+    json_msg = json.dumps(msg)
 
     # send message to SQS
     queueUrl = get_queue_url(queue_name=REQUEST_QUEUE_NAME)
