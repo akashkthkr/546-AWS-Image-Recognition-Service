@@ -7,7 +7,7 @@ import os
 import constants
 import EC2AutoScaling
 import SQSManagement
-import subprocess
+import subprocess, json
 
 
 # Constants
@@ -44,10 +44,14 @@ def get_message(queue_url):
             VisibilityTimeout=8,
             WaitTimeSeconds=20
         )
-        message = sqs_response
-        return message[0] if message else None
+        message = sqs_response.get('Messages', None)
+        if message:
+            return message[0]
+        else:
+            return None
     except ClientError as e:
         logging.error(e)
+
 
 
 def send_message_to_queue_response(queue_url, image_name):
@@ -114,17 +118,18 @@ def get_output_from_classification(image_file_jpg):
 if __name__ == '__main__':
     while True:
         print("running_app_tier start")
-        if sqs_management_instance.numberOfMessagesInQueue(SQS_REQUEST_QUEUE_NAME):
+        if sqs_management_instance.numberOfMessagesInQueue():
             break
-        print("queueMessageCount :" + sqs_management_instance.numberOfMessagesInQueue(SQS_REQUEST_QUEUE_NAME));
-        print("QueueURl :"+sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME))
-        message = get_message(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME))
+        print("queueMessageCount :" + sqs_management_instance.numberOfMessagesInQueue());
+        print("QueueURl :"+sqs_management_instance.get_queue_url())
+        message = get_message(sqs_management_instance.get_queue_url())
         if message is None:
             break
         print("running_app_tier middle")
-        msg_filename_key = message.get('key')
+        payload = json.loads(message.get("Body"))
+        msg_filename_key = payload.get('key')
         print("msg_filename_key :" + msg_filename_key)
-        msg_base64_encoded_value = message.get('value')
+        msg_base64_encoded_value = payload.get('value')
         print("msg_base64_encoded_value :" + msg_base64_encoded_value)
         transient_binary_file = msg_filename_key
         image_file_jpg = get_image_after_decoding_base64(msg_base64_encoded_value)
@@ -139,5 +144,5 @@ if __name__ == '__main__':
         os.remove(transient_binary_file)
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), msg_filename_key)
         # deleting message after the message response is sent to queue
-        delete_message_request(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME), message['ReceiptHandle'])
+        delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
     # shutting_down_instances()
