@@ -26,7 +26,6 @@ def create_SQS_queue(SQS_QUEUE_NAME=REQUEST_QUEUE_NAME):
         logging.error(
             "Unable to create a SQS queue with the given name, recheck the queue name")
 
-
 def get_queue_url(queue_name=REQUEST_QUEUE_NAME):
     return client.get_queue_url(QueueName=queue_name)['QueueUrl']
 

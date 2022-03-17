@@ -11,6 +11,8 @@ EC2_KEY_NAME = "ec2-key-pair"
 USER_DATA = f"""#!bin/bash
 yum update -y
 yum install git -y
+cd /home/ec2-user/546_AWS_Image_Recognition_Service
+git pull
 """
 
 ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
@@ -140,8 +142,7 @@ def auto_scale_instances():
             return
 
 while True:
-    print(STARTUP_BANNER)
     logging.debug("*********** Started EC2 auto scaling according to queue length**************")
     #auto_scale_instances()
-    #get_instances_by_state()
+    get_instances_by_state()
     time.sleep(10)
