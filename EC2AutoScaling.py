@@ -16,9 +16,11 @@ key = os.environ['AWS_ACCESS_KEY_ID']
 secret = os.environ['AWS_SECRET_ACCESS_KEY']
 print("key "+ key)
 print("secret " +secret)
-ec2_client = boto3.client('ec2', aws_access_key_id=key, aws_secret_access_key=secret,region_name=constants.REGION_NAME)
-ec2_res = boto3.resource('ec2', aws_access_key_id=key, aws_secret_access_key=secret,region_name=constants.REGION_NAME)
+# ec2_client = boto3.client('ec2', aws_access_key_id=key, aws_secret_access_key=secret,region_name=constants.REGION_NAME)
+# ec2_res = boto3.resource('ec2', aws_access_key_id=key, aws_secret_access_key=secret,region_name=constants.REGION_NAME)
 
+ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
+ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME)
 
 def create_key_pair():
     try:
@@ -86,9 +88,7 @@ def terminate_instance(instance_ids):
     logging.debug(response)
 
 
-def get_instances_by_state(state=None):
-    if state is None:
-        state = ['running']
+def get_instances_by_state(state=['running']):
     filters = [
         {
             'Name': 'instance-state-name',
@@ -115,6 +115,10 @@ def auto_scale_instances():
         stop_instances(get_instances_by_state())
     else:
         number_of_running_instances = len(get_instances_by_state())
+        number_of_pending_instances = len(get_instances_by_state(['pending']))
+        # if some instances are starting up, cool down
+        if number_of_pending_instances > 0:
+            return
         logging.debug("Number of running instances: %s", number_of_running_instances)
         if number_of_running_instances >= MAX_LIMIT_INSTANCES:
             logging.debug("Infra at MAX CAPACITY %s, can not scale out", MAX_LIMIT_INSTANCES)
