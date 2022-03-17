@@ -12,8 +12,8 @@ USER_DATA = f"""#!bin/bash
 yum update -y
 yum install git -y
 """
-ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
-ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME)
+ec2_client = boto3.client('ec2', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],region_name=constants.REGION_NAME)
+ec2_res = boto3.resource('ec2', aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'], aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],region_name=constants.REGION_NAME)
 
 
 def create_key_pair():
@@ -69,7 +69,6 @@ def create_instance(min_count=1, max_count=1):
             ])
     except ClientError as e:
         print("Unexpected error: %s" % e)
-
 
 def stop_instances(instance_ids):
     logging.debug("Stopping instance:", instance_ids)
