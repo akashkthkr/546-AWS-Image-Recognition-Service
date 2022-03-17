@@ -103,6 +103,7 @@ def shutting_down_instances():
 
 
 def get_image_after_decoding_base64(msg_filename_key, msg_value):
+    msg_value = bytes(msg_value, 'utf-8')
     with open('encode.bin', "wb") as file:
         file.write(msg_value)
     file = open('encode.bin', 'rb')
