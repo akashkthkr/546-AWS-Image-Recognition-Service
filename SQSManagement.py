@@ -42,5 +42,8 @@ def numberOfMessagesInQueue(queue_name=REQUEST_QUEUE_NAME):
         QueueUrl=get_queue_url(queue_name),
         AttributeNames=['ApproximateNumberOfMessages']
     )
-    logging.debug("numberOfMessagesInQueue %s %s", queue_name, int(response.ApproximateNumberOfMessages))
-    return int(response.ApproximateNumberOfMessages)
+    number = -1
+    if response['Attributes'] and response['Attributes']['ApproximateNumberOfMessages']:
+        number = response['Attributes']['ApproximateNumberOfMessages']
+    logging.debug("numberOfMessagesInQueue %s %s", queue_name, int(number))
+    return int(number)
