@@ -88,7 +88,7 @@ def terminate_instance(instance_ids):
     logging.debug(response)
 
 
-def get_instances_by_state(state=['running']):
+def get_instances_by_state(state=['running', 'stopped']):
     filters = [
         {
             'Name': 'instance-state-name',
@@ -101,6 +101,7 @@ def get_instances_by_state(state=['running']):
     ]
     instances = ec2_res.instances.filter(Filters=filters)
     for instance in instances:
+        print(instance.id)
         logging.debug(instance.id)
     return [instance.id for instance in instances]
 
@@ -146,9 +147,9 @@ def auto_scale_instances():
             # stop half of the instances
             return
 
-
 while True:
     # test commit
     logging.debug("starting auto scaling")
-    auto_scale_instances()
+    #auto_scale_instances()
+    get_instances_by_state()
     time.sleep(10)
