@@ -44,7 +44,7 @@ def get_message(queue_url):
             VisibilityTimeout=8,
             WaitTimeSeconds=20
         )
-        message = sqs_response.get('Messages', None)
+        message = sqs_response
         return message[0] if message else None
     except ClientError as e:
         logging.error(e)
@@ -113,11 +113,15 @@ def get_output_from_classification(image_file_jpg):
 
 def running_app_tier():
     while True:
+        print("running_app_tier start")
         if sqs_management_instance.numberOfMessagesInQueue(SQS_REQUEST_QUEUE_NAME):
             break
+        print("queueMessageCount :" + sqs_management_instance.numberOfMessagesInQueue(SQS_REQUEST_QUEUE_NAME));
+        print("QueueURl :"+sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME))
         message = get_message(sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME))
         if message is None:
             break
+        print("running_app_tier middle")
         msg_filename_key = message.get('key')
         print("msg_filename_key :" + msg_filename_key)
         msg_base64_encoded_value = message.get('value')
