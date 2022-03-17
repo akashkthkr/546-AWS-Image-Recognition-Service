@@ -26,8 +26,8 @@ async def async_get_data(msg):
 
 app = Quart(__name__)
 
-@app.route('/webTier', methods=['POST'])
-async def webTier():
+@app.route('/classify-image', methods=['POST'])
+async def classify_image():
     file = (await request.files)['myfile']
     key = str(file.filename)
     value = base64.b64encode(file.read())
