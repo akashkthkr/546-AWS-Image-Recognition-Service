@@ -23,12 +23,10 @@ sqs_management_instance = SQSManagement
 ec2_auto_scale_instance = EC2AutoScaling
 
 # app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
-app_sqs_client = boto3.client('sqs', aws_access_key_id= os.environ["AWS_ACCESS_KEY_ID"],
-                              aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+app_sqs_client = boto3.client('sqs',
                               region_name=constants.REGION_NAME)
 
-s3_client = boto3.client('s3', aws_access_key_id= os.environ["AWS_ACCESS_KEY_ID"],
-                         aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+s3_client = boto3.client('s3', 
                          region_name=constants.REGION_NAME)
 
 response_queue_url = sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME)
@@ -105,7 +103,7 @@ def shutting_down_instances():
 
 
 def get_image_after_decoding_base64(msg_value):
-    return base64.decodestring(msg_value)
+    return base64.b64decode(msg_value)
 
 # this one is to be checked and completed
 def get_output_from_classification(image_file_jpg):
@@ -118,10 +116,8 @@ def get_output_from_classification(image_file_jpg):
 if __name__ == '__main__':
     while True:
         print("running_app_tier start")
-        if sqs_management_instance.numberOfMessagesInQueue():
+        if sqs_management_instance.numberOfMessagesInQueue() == 0:
             break
-        print("queueMessageCount :" + sqs_management_instance.numberOfMessagesInQueue());
-        print("QueueURl :"+sqs_management_instance.get_queue_url())
         message = get_message(sqs_management_instance.get_queue_url())
         if message is None:
             break
@@ -133,12 +129,11 @@ if __name__ == '__main__':
         print("msg_base64_encoded_value :" + msg_base64_encoded_value)
         transient_binary_file = msg_filename_key
         image_file_jpg = get_image_after_decoding_base64(msg_base64_encoded_value)
-        print("image_file_jpg :" + image_file_jpg)
-        store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, image_file_jpg)
-        classified_predicted_result = get_output_from_classification(image_file_jpg)
+        classified_predicted_result = "test" #get_output_from_classification(image_file_jpg)
         key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
         print("key_value_pair_predicted :" + key_value_pair_predicted)
         write_to_file(transient_binary_file, key_value_pair_predicted)
+        store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, image_file_jpg)
         print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file )
         save_result_file_into_bucket(transient_binary_file, S3_OUTPUT_BUCKET, transient_binary_file)
         os.remove(transient_binary_file)
