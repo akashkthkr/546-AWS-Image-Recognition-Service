@@ -23,11 +23,11 @@ sqs_management_instance = SQSManagement
 # app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
 app_sqs_client = boto3.client('sqs',
                               region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
-                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
+                              aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
-s3_client = boto3.client('s3', 
+s3_client = boto3.client('s3',
                          region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
-                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
+                         aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
 response_queue_url = sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME)
 request_queue_url = sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME)
@@ -81,15 +81,15 @@ def store_image_to_s3(file_name, bucket_name, image_file):
         logging.error(e)
 
 
-# def write_to_file(image_name, result):
-#     with open(image_name, "rb") as f:
-#         f.write(bytes(result, 'utf8'))
-#         f.close()
+# Write to a binary file
+def write_to_file(image_name, result):
+    with open(image_name, "wb") as f:
+        f.write(bytes((result), 'utf8'))
+        f.close()
 
 
 def save_result_file_into_bucket(file_name, bucket_name, object_name):
     try:
-        # s3_client = boto3.client('s3')
         response = s3_client.upload_file(file_name, bucket_name, object_name)
     except ClientError as e:
         logging.error(e)
@@ -107,14 +107,6 @@ def get_image_after_decoding_base64(msg_filename_key, msg_value):
     decodeit.close()
     os.remove("encode.bin")
 
-
-# this one is to be checked and completed
-# def get_output_from_classification(image_file_jpg):
-#     # os.chdir(r"../")
-#     classification_predicted_result = subprocess.check_output(["python3", "../face_recognition.py", image_file_jpg])
-#     print("classification_predicted_result :" + str(classification_predicted_result))
-#     return classification_predicted_result
-
 def classify_image_sub(base64ImageStr, imageName):
     base64Image = bytes(base64ImageStr, 'utf-8')
     with open(imageName, "wb") as fh:
@@ -128,25 +120,26 @@ if __name__ == '__main__':
         print("running_app_tier start")
         message = get_message(sqs_management_instance.get_queue_url())
         if message is None:
-            break
-        print("running_app_tier middle")
+            continue
         payload = json.loads(message.get("Body"))
         msg_filename_key = payload.get('key')
-        print("msg_filename_key :" + msg_filename_key)
         msg_base64_encoded_value = payload.get('value')
-        print("msg_base64_encoded_value :" + str(msg_base64_encoded_value))
-        transient_binary_file = msg_filename_key
+        # Getting the encoded message
+        # Getting the Classified output
         classified_predicted_result = classify_image_sub(msg_base64_encoded_value, msg_filename_key)
-        key_value_pair_predicted_json= json.dumps({'key': str(msg_filename_key), 'value': str(classified_predicted_result)})
-        # key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
-        print("key_value_pair_predicted :" + str(msg_filename_key) + " " + str(classified_predicted_result))
+        key_value_pair_predicted_json = json.dumps({'key': str(msg_filename_key), 'value': str(classified_predicted_result)})
+        print("key_value_pair_predicted ")
         print(key_value_pair_predicted_json)
-        # write_to_file(transient_binary_file, key_value_pair_predicted)
+        print("Storing Image to S3")
         store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, msg_filename_key)
-        print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file)
-        save_result_file_into_bucket(transient_binary_file, S3_OUTPUT_BUCKET, transient_binary_file)
-        print("saving to s3 buckets")
-        os.remove(transient_binary_file)
+        print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " Image File Name :" + msg_filename_key)
+        print("Saved to s3 output bucket")
+        # removing the Image png File
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted_json)
-        # deleting message after the message response is sent to queue
+        file_name_without_jpg = str(msg_filename_key.split('.')[0])
+        write_to_file(file_name_without_jpg, classified_predicted_result)
+        save_result_file_into_bucket(msg_filename_key, S3_OUTPUT_BUCKET, msg_filename_key)
+        # Deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
+        os.remove(msg_filename_key)
+
