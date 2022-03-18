@@ -2,6 +2,7 @@ from asyncio import constants
 import boto3
 import logging
 import constants
+import json
 import os
 from botocore.exceptions import ClientError
 
@@ -32,11 +33,33 @@ def get_queue_url(queue_name=REQUEST_QUEUE_NAME):
 
 def send_message(queueUrl, msg):
     response = client.send_message(
-        QueueUrl = queueUrl,
-        MessageBody = msg
+        QueueUrl=queueUrl,
+        MessageBody=msg
     )
     logging.debug(response.get('MessageId'))
 
+
+def receive_message(queueUrl):
+    response = client.receive_message(
+        QueueUrl=queueUrl,
+        MaxNumberOfMessages=10,
+        WaitTimeSeconds=10,
+        VisibilityTimeout=123,
+    )
+    return response.get('Messages', [])
+    # print(f"Number of messages received: {len(response.get('Messages', []))}")
+    # for message in response.get("Messages", []):
+    #     message_body = message["Body"]
+    #     print(f"Message body: {json.loads(message_body)}")
+    #     print(f"Receipt Handle: {message['ReceiptHandle']}")
+
+
+def delete_message(QueueUrl, receipt_handle):
+    response = client.delete_message(
+        QueueUrl=QueueUrl,
+        ReceiptHandle=receipt_handle,
+    )
+    print(response)
 
 def numberOfMessagesInQueue(queue_name=REQUEST_QUEUE_NAME):
     response = client.get_queue_attributes(
