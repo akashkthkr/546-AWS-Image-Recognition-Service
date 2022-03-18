@@ -49,7 +49,7 @@ async def classify_image():
     send_message(get_queue_url(constants.AWS_SQS_REQUEST_QUEUE_NAME), json_msg)
 
     # receive message from SQS
-    while not result_dict.has_key(key):
+    while key not in result_dict:
         sleep(1)
     return result_dict[key]
   
