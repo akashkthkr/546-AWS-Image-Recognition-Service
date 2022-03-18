@@ -8,6 +8,7 @@ import json
 import constants
 from SQSManagement import *
 from logging.config import dictConfig
+from threading import Thread
 
 dictConfig({
     'version': 1,
@@ -69,4 +70,6 @@ if __name__ == '__main__':
     app.logger.info(constants.STARTUP_BANNER)
     app.logger.info(constants.STARTUP_BANNER_GROUP)
     app.run(host='0.0.0.0', debug=True, port=6060)
-    asyncio.run(collect_response())
+    resultsThread = Thread(target=collect_response)
+    resultsThread.start()
+    print("Result thread started")
