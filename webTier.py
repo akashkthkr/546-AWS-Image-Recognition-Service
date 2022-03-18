@@ -6,6 +6,7 @@ import asyncio
 import boto3
 import json
 import constants
+import time
 from SQSManagement import *
 from logging.config import dictConfig
 from threading import Thread
@@ -26,7 +27,7 @@ RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 
 app = Quart(__name__)
 
-async def collect_response():
+def collect_response():
     while True:
         queue_url = get_queue_url(constants.AWS_SQS_RESPONSE_QUEUE_NAME)
         response = receive_message(queue_url)
@@ -36,7 +37,7 @@ async def collect_response():
             message_dict = json.loads(message_body)
             result_dict[message_dict['key']] = message_dict['value']
             delete_message(queue_url, message['ReceiptHandle'])
-        await asyncio.sleep(1)
+        time.sleep(1)
 
 async def get_result(key):
     while True:
