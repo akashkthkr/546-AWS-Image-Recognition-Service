@@ -7,6 +7,8 @@ AWS_S3_INPUT_BUCKET_NAME = "cc-546-grp-11-input-bucket"
 AWS_S3_OUTPUT_BUCKET_NAME = "cc-546-grp-11-output-bucket"
 AWS_SQS_REQUEST_QUEUE_NAME = "images-requests"
 AWS_SQS_RESPONSE_QUEUE_NAME = "images-responses"
+AWS_ACCESS_KEY_ID = ""
+AWS_ACCESS_KEY_SECRET = ""
 ## SWAG
 STARTUP_BANNER =f"""
  +-+ +-+ +-+ +-+ +-+   +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+ +-+

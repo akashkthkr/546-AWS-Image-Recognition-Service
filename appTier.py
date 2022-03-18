@@ -21,10 +21,12 @@ sqs_management_instance = SQSManagement
 
 # app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
 app_sqs_client = boto3.client('sqs',
-                              region_name=constants.REGION_NAME)
+                              region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
+                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
 s3_client = boto3.client('s3', 
-                         region_name=constants.REGION_NAME)
+                         region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
+                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET))
 
 response_queue_url = sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME)
 request_queue_url = sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME)
