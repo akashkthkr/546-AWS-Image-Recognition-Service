@@ -132,7 +132,7 @@ if __name__ == '__main__':
         get_image_after_decoding_base64(msg_filename_key, msg_base64_encoded_value)
         classified_predicted_result = "test" #get_output_from_classification(image_file_jpg)
         key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
-        print("key_value_pair_predicted :" + str(key_value_pair_predicted))
+        print("key_value_pair_predicted :" + str(msg_filename_key) + str(classified_predicted_result))
         # write_to_file(transient_binary_file, key_value_pair_predicted)
         store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, msg_filename_key)
         print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file)
