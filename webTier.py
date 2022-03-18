@@ -32,7 +32,7 @@ def collect_response():
         queue_url = get_queue_url(constants.AWS_SQS_RESPONSE_QUEUE_NAME)
         response = receive_message(queue_url)
         app.logger.debug("Recevied response from queue %s", response)
-        for message in response.get("Messages", []):
+        for message in response:
             message_body = message['Body']
             message_dict = json.loads(message_body)
             result_dict[message_dict['key']] = message_dict['value']
