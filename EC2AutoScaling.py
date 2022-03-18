@@ -83,6 +83,9 @@ def stop_instances(instance_ids):
 
 
 def terminate_instance(instance_ids):
+    if len(instance_ids) == 0:
+          return
+    logging.debug("Stopping instance: %s", instance_ids)
     response = ec2_client.terminate_instances(InstanceIds=instance_ids)
     logging.debug(response)
 
@@ -113,7 +116,7 @@ def auto_scale_instances():
     if queue_length == 0:
         logging.debug("No Request in queue ****SCALE IN****, stopping all instances")
         # make sure the instance is idle and do not stop if it is currenlty processing a request
-        stop_instances(get_instances_by_state())
+        terminate_instance(get_instances_by_state())
     else:
         number_of_running_instances = len(get_instances_by_state())
         number_of_pending_instances = len(get_instances_by_state(['pending']))
@@ -121,7 +124,7 @@ def auto_scale_instances():
         if number_of_pending_instances > 0:
             return
         logging.debug("Number of running instances: %s", number_of_running_instances)
-        if number_of_running_instances >= MAX_LIMIT_INSTANCES:
+        if number_of_running_instances >= MAX_LIMIT_INSTANCES or number_of_pending_instances >= MAX_LIMIT_INSTANCES:
             logging.debug("Infra at MAX CAPACITY %s, can not scale out", MAX_LIMIT_INSTANCES)
             return
         # scale up
