@@ -25,19 +25,15 @@ RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 
 app = Quart(__name__)
 
-
 async def collect_response():
-    while True:
-        queue_url = get_queue_url(constants.AWS_SQS_RESPONSE_QUEUE_NAME)
-        response = receive_message(queue_url)
-        for message in response.get("Messages", []):
-            message_body = message['Body']
-            message_dict = json.loads(message_body)
-            result_dict[message_dict['key']] = message_dict['value']
-            delete_message(queue_url, message['ReceiptHandle'])
-        sleep(1)
-
-
+    queue_url = get_queue_url(constants.AWS_SQS_RESPONSE_QUEUE_NAME)
+    response = receive_message(queue_url)
+    app.logger.debug("Recevied response from queue %s", response)
+    for message in response.get("Messages", []):
+        message_body = message['Body']
+        message_dict = json.loads(message_body)
+        result_dict[message_dict['key']] = message_dict['value']
+        delete_message(queue_url, message['ReceiptHandle'])
 
 @app.route('/classify-image', methods=['POST'])
 async def classify_image():
@@ -47,7 +43,7 @@ async def classify_image():
     key = str(file.filename)
     # create message
     json_msg = json.dumps({'key': key, 'value': value})
-    app.logger.debug("Request processed with payload %s", json_msg)
+    app.logger.debug("Request processed with payload %s", json_msg['key'])
 
     # send message to SQS
     send_message(get_queue_url(constants.AWS_SQS_REQUEST_QUEUE_NAME), json_msg)
@@ -66,4 +62,6 @@ if __name__ == '__main__':
     app.logger.info(constants.STARTUP_BANNER)
     app.logger.info(constants.STARTUP_BANNER_GROUP)
     app.run(host='0.0.0.0', debug=True, port=6060)
-    collect_response()
+    while True:
+        collect_response()
+        sleep(1)
