@@ -79,10 +79,10 @@ def store_image_to_s3(file_name, bucket_name, image_file):
         logging.error(e)
 
 
-def write_to_file(image_name, result):
-    with open(image_name, "rb") as f:
-        f.write(bytes(result, 'utf8'))
-        f.close()
+# def write_to_file(image_name, result):
+#     with open(image_name, "rb") as f:
+#         f.write(bytes(result, 'utf8'))
+#         f.close()
 
 
 def save_result_file_into_bucket(file_name, bucket_name, object_name):
