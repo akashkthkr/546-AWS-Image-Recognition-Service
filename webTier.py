@@ -43,7 +43,7 @@ async def classify_image():
     key = str(file.filename)
     # create message
     json_msg = json.dumps({'key': key, 'value': value})
-    app.logger.debug("Request processed with payload %s", str(json_msg['key']))
+    # app.logger.debug("Request processed with payload %s", json_msg['key'])
 
     # send message to SQS
     send_message(get_queue_url(constants.AWS_SQS_REQUEST_QUEUE_NAME), json_msg)
