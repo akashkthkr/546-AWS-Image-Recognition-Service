@@ -1,6 +1,6 @@
 REGION_NAME = "us-east-1"
 SECURITY_GROUP_ID = ["sg-0bb98ead470e1d287"]
-APP_TIER_AMI = "ami-01c47a78265257bc6"
+APP_TIER_AMI = "ami-052a117fb5b2b83d0"
 INSTANCE_TYPE = 't2.micro'
 AWS_S3_INPUT_BUCKET_NAME = "cc-546-grp-11-input-bucket"
 AWS_S3_OUTPUT_BUCKET_NAME = "cc-546-grp-11-output-bucket"
