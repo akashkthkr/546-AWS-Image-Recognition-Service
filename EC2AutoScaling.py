@@ -4,6 +4,7 @@ import SQSManagement
 import time, os, sys
 import constants
 from botocore.exceptions import ClientError
+from random import randrange
 
 logging.basicConfig(filename='ec2AutoScaling.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 MAX_LIMIT_INSTANCES = 19
@@ -60,11 +61,13 @@ def create_instance(min_count=1, max_count=1):
             SecurityGroupIds=constants.SECURITY_GROUP_ID,
             UserData=USER_DATA
         )
+        current_running_count = len(get_instances_by_state())
         for instance in instances:
+            current_running_count+=1
             ec2_res.create_tags(Resources=[instance.id], Tags=[
                 {
                     'Key': 'Name',
-                    'Value': "app-instance1",
+                    'Value': "app-instance-" + str(current_running_count),
                 },
             ])
     except ClientError as e:
@@ -103,6 +106,7 @@ def get_instances_by_state(state=['running']):
 def auto_scale_instances():
     queue_length = SQSManagement.numberOfMessagesInQueue()
     logging.debug("Request queue length: %s", queue_length)
+    print("Request queue length:", queue_length)
 
     if queue_length == 0:
         logging.debug("No Request in queue ****SCALE IN****, stopping all instances")
