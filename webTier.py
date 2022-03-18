@@ -35,6 +35,13 @@ async def collect_response():
         result_dict[message_dict['key']] = message_dict['value']
         delete_message(queue_url, message['ReceiptHandle'])
 
+async def get_result(key):
+    while True:
+        sleep(1)
+        if key in result_dict:
+            return result_dict[key]
+        
+        
 @app.route('/classify-image', methods=['POST'])
 async def classify_image():
     file = (await request.files)['myfile']
@@ -43,25 +50,20 @@ async def classify_image():
     key = str(file.filename)
     # create message
     json_msg = json.dumps({'key': key, 'value': value})
-    app.logger.debug("Request processed with payload %s", json_msg['key'])
+    # app.logger.debug("Request processed with payload %s", json_msg['key'])
 
     # send message to SQS
     send_message(get_queue_url(constants.AWS_SQS_REQUEST_QUEUE_NAME), json_msg)
 
     # receive message from SQS
-    while not result_dict.has_key(key):
-        sleep(1)
-    return result_dict[key]
-
+    return await get_result(key)
+  
 @app.route('/health', methods=['GET'])
 def healthcheck():
-    app.logger.debug('OK')
-    return "200"
+  app.logger.debug('OK')
+  return "200"
 
 if __name__ == '__main__':
     app.logger.info(constants.STARTUP_BANNER)
     app.logger.info(constants.STARTUP_BANNER_GROUP)
     app.run(host='0.0.0.0', debug=True, port=6060)
-    while True:
-        collect_response()
-        sleep(1)
