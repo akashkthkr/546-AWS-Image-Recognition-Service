@@ -8,12 +8,9 @@ import json
 import constants
 from SQSManagement import *
 from logging.config import dictConfig
-import schedule
-import time
 
 dictConfig({
     'version': 1,
-    
     'loggers': {
         'quart.app': {
             'level': 'DEBUG',
@@ -28,7 +25,7 @@ RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 
 app = Quart(__name__)
 
-def collect_response():
+async def collect_response():
     queue_url = get_queue_url(constants.AWS_SQS_RESPONSE_QUEUE_NAME)
     response = receive_message(queue_url)
     app.logger.debug("Recevied response from queue %s", response)
@@ -67,7 +64,6 @@ def healthcheck():
   return "200"
 
 if __name__ == '__main__':
-    schedule.every(2).seconds.do(collect_response())
     app.logger.info(constants.STARTUP_BANNER)
     app.logger.info(constants.STARTUP_BANNER_GROUP)
     app.run(host='0.0.0.0', debug=True, port=6060)
