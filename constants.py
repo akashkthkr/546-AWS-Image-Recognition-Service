@@ -1,7 +1,8 @@
 REGION_NAME = "us-east-1"
 SECURITY_GROUP_ID = ["sg-0bb98ead470e1d287"]
 #APP_TIER_AMI = "ami-0a55e620aa5c79a24" OG IMAGE
-APP_TIER_AMI="ami-0a3cffc7ceda79086"
+#APP_TIER_AMI="ami-0a3cffc7ceda79086" Second working og image, hahaha
+APP_TIER_AMI = "ami-01c47a78265257bc6"
 INSTANCE_TYPE = 't2.micro'
 AWS_S3_INPUT_BUCKET_NAME = "cc-546-grp-11-input-bucket"
 AWS_S3_OUTPUT_BUCKET_NAME = "cc-546-grp-11-output-bucket"
