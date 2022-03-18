@@ -1,6 +1,6 @@
 from quart import Quart, request, jsonify
 from PIL import Image
-from time import sleep
+#from time import sleep
 import base64
 import asyncio
 import boto3
@@ -26,18 +26,20 @@ RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 app = Quart(__name__)
 
 async def collect_response():
-    queue_url = get_queue_url(constants.AWS_SQS_RESPONSE_QUEUE_NAME)
-    response = receive_message(queue_url)
-    app.logger.debug("Recevied response from queue %s", response)
-    for message in response.get("Messages", []):
-        message_body = message['Body']
-        message_dict = json.loads(message_body)
-        result_dict[message_dict['key']] = message_dict['value']
-        delete_message(queue_url, message['ReceiptHandle'])
+    while True:
+        queue_url = get_queue_url(constants.AWS_SQS_RESPONSE_QUEUE_NAME)
+        response = receive_message(queue_url)
+        app.logger.debug("Recevied response from queue %s", response)
+        for message in response.get("Messages", []):
+            message_body = message['Body']
+            message_dict = json.loads(message_body)
+            result_dict[message_dict['key']] = message_dict['value']
+            delete_message(queue_url, message['ReceiptHandle'])
+        await asyncio.sleep(1)
 
 async def get_result(key):
     while True:
-        sleep(1)
+        await asyncio.sleep(1)
         if key in result_dict:
             return result_dict[key]
         
@@ -67,3 +69,4 @@ if __name__ == '__main__':
     app.logger.info(constants.STARTUP_BANNER)
     app.logger.info(constants.STARTUP_BANNER_GROUP)
     app.run(host='0.0.0.0', debug=True, port=6060)
+    asyncio.run(collect_response())
