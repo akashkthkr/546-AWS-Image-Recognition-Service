@@ -110,17 +110,17 @@ def get_image_after_decoding_base64(msg_filename_key, msg_value):
 
 
 # this one is to be checked and completed
-def get_output_from_classification(image_file_jpg):
-    # os.chdir(r"../")
-    classification_predicted_result = subprocess.check_output(["python3", "../face_recognition.py", image_file_jpg])
-    print("classification_predicted_result :" + str(classification_predicted_result))
-    return classification_predicted_result
+# def get_output_from_classification(image_file_jpg):
+#     # os.chdir(r"../")
+#     classification_predicted_result = subprocess.check_output(["python3", "../face_recognition.py", image_file_jpg])
+#     print("classification_predicted_result :" + str(classification_predicted_result))
+#     return classification_predicted_result
 
 def classify_image_sub(base64ImageStr, imageName):
     base64Image = bytes(base64ImageStr, 'utf-8')
     with open(imageName, "wb") as fh:
         fh.write(base64.decodebytes(base64Image))
-    out = check_output(["python3", "-W ignore", "face_recognition.py", imageName]).strip().decode('utf-8')
+    out = check_output(["python3", "-W ignore", "../face_recognition.py", imageName]).strip().decode('utf-8')
     os.remove(imageName)
     return out
 
