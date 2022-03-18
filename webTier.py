@@ -50,6 +50,8 @@ async def classify_image():
 
     # receive message from SQS
     while key not in result_dict:
+        app.logger.debug("in while loop %s", result_dict)
+        collect_response()
         sleep(1)
     return result_dict[key]
   
@@ -62,6 +64,3 @@ if __name__ == '__main__':
     app.logger.info(constants.STARTUP_BANNER)
     app.logger.info(constants.STARTUP_BANNER_GROUP)
     app.run(host='0.0.0.0', debug=True, port=6060)
-    while True:
-        collect_response()
-        sleep(1)
