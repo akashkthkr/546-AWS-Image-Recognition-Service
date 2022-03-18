@@ -119,8 +119,8 @@ def get_output_from_classification(image_file_jpg):
 if __name__ == '__main__':
     while True:
         print("running_app_tier start")
-        if sqs_management_instance.numberOfMessagesInQueue() == 0:
-            break
+        # if sqs_management_instance.numberOfMessagesInQueue() == 0:
+        #     break
         message = get_message(sqs_management_instance.get_queue_url())
         if message is None:
             break
@@ -132,7 +132,7 @@ if __name__ == '__main__':
         print("msg_base64_encoded_value :" + str(msg_base64_encoded_value))
         transient_binary_file = msg_filename_key
         get_image_after_decoding_base64(msg_filename_key, msg_base64_encoded_value)
-        classified_predicted_result = "test" #get_output_from_classification(image_file_jpg)
+        classified_predicted_result = get_output_from_classification(msg_filename_key)
         key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
         print("key_value_pair_predicted :" + str(msg_filename_key) + str(classified_predicted_result))
         print(key_value_pair_predicted)
