@@ -10,10 +10,9 @@ logging.basicConfig(filename='ec2AutoScaling.log', format='%(asctime)s - %(name)
 MAX_LIMIT_INSTANCES = 19
 EC2_KEY_NAME = "ec2-key-pair"
 USER_DATA = f"""#!bin/bash
-yum update -y
-yum install git -y
 cd /home/ec2-user/546_AWS_Image_Recognition_Service
 git pull
+python3 appTier.py
 """
 
 ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
