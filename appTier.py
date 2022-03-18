@@ -52,10 +52,10 @@ def get_message(queue_url):
 
 
 
-def send_message_to_queue_response(queue_url, image_name):
+def send_message_to_queue_response(queue_url, image_classification_key_value):
     try:
         response = app_sqs_client.send_message(QueueUrl=queue_url,
-                                               MessageBody=image_name)
+                                               MessageBody=image_classification_key_value)
         print("send_message_to_queue_response")
     except ClientError as e:
         logging.error(e)
@@ -75,7 +75,6 @@ def delete_message_request(queue_url, receipt_handle):
 
 def store_image_to_s3(file_name, bucket_name, image_file):
     try:
-        # s3_client = boto3.client('s3')
         response = s3_client.upload_file(file_name, bucket_name, image_file)
         print("image_loaded")
     except ClientError as e:
@@ -121,7 +120,6 @@ def classify_image_sub(base64ImageStr, imageName):
     with open(imageName, "wb") as fh:
         fh.write(base64.decodebytes(base64Image))
     out = check_output(["python3", "-W ignore", "../face_recognition.py", imageName]).strip().decode('utf-8')
-    os.remove(imageName)
     return out
 
 
@@ -138,18 +136,17 @@ if __name__ == '__main__':
         msg_base64_encoded_value = payload.get('value')
         print("msg_base64_encoded_value :" + str(msg_base64_encoded_value))
         transient_binary_file = msg_filename_key
-        # get_image_after_decoding_base64(msg_filename_key, msg_base64_encoded_value)
-        # classified_predicted_result = get_output_from_classification(msg_filename_key)
         classified_predicted_result = classify_image_sub(msg_base64_encoded_value, msg_filename_key)
-        key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
-        print("key_value_pair_predicted :" + str(msg_filename_key) + str(classified_predicted_result))
-        print(key_value_pair_predicted)
+        key_value_pair_predicted_json= json.dumps({'key': str(msg_filename_key), 'value': str(classified_predicted_result)})
+        # key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
+        print("key_value_pair_predicted :" + str(msg_filename_key) + " " + str(classified_predicted_result))
+        print(key_value_pair_predicted_json)
         # write_to_file(transient_binary_file, key_value_pair_predicted)
         store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, msg_filename_key)
         print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file)
         save_result_file_into_bucket(transient_binary_file, S3_OUTPUT_BUCKET, transient_binary_file)
         print("saving to s3 buckets")
         os.remove(transient_binary_file)
-        send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted)
+        send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted_json)
         # deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
