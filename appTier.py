@@ -136,11 +136,11 @@ if __name__ == '__main__':
         print("Saved to s3 output bucket")
         # removing the Image png File
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted_json)
+        os.remove(msg_filename_key)
         file_name_without_jpg = str(msg_filename_key.split('.')[0])
         write_to_file(file_name_without_jpg, classified_predicted_result)
         save_result_file_into_bucket(file_name_without_jpg, S3_OUTPUT_BUCKET, file_name_without_jpg)
         # Deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
-        os.remove(msg_filename_key)
         os.remove(file_name_without_jpg)
 
