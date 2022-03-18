@@ -43,7 +43,7 @@ async def get_result(key):
     while True:
         await asyncio.sleep(1)
         if key in result_dict:
-            output_to_be_returned = '{0}'.format(key, result_dict[key])
+            output_to_be_returned = '{0}'.format(result_dict[key])
             print("WebTier Output returned" + str(output_to_be_returned))
             del result_dict[key]
             return output_to_be_returned
