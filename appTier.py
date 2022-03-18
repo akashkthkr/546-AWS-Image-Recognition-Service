@@ -142,4 +142,5 @@ if __name__ == '__main__':
         # Deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
         os.remove(msg_filename_key)
+        os.remove(file_name_without_jpg)
 
