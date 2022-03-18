@@ -73,13 +73,14 @@ def create_instance(min_count=1, max_count=1):
         print("Unexpected error: %s" % e)
 
 def stop_instances(instance_ids):
-    logging.debug("Stopping instance:", instance_ids)
+    if len(instance_ids) == 0:
+          return
+    logging.debug("Stopping instance: %s", instance_ids)
     response = ec2_client.stop_instances(InstanceIds=instance_ids)
     logging.debug(response)
 
 
 def terminate_instance(instance_ids):
-    logging.debug("Terminating instance:", instance_ids)
     response = ec2_client.terminate_instances(InstanceIds=instance_ids)
     logging.debug(response)
 
