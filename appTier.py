@@ -5,10 +5,8 @@ from botocore.exceptions import ClientError
 import logging
 import os
 import constants
-import EC2AutoScaling
 import SQSManagement
 import subprocess, json
-
 
 # Constants
 S3_INPUT_BUCKET = constants.AWS_S3_INPUT_BUCKET_NAME
@@ -20,7 +18,6 @@ SQS_RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 # initialization and instantiations
 
 sqs_management_instance = SQSManagement
-ec2_auto_scale_instance = EC2AutoScaling
 
 # app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
 app_sqs_client = boto3.client('sqs',
@@ -96,12 +93,6 @@ def save_result_file_into_bucket(file_name, bucket_name, object_name):
         logging.error(e)
 
 
-def shutting_down_instances():
-    instance_ids = ec2_auto_scale_instance.get_instances_by_state()
-    ec2_auto_scale_instance.stop_instances(instance_ids)
-    return None
-
-
 def get_image_after_decoding_base64(msg_filename_key, msg_value):
     msg_value = bytes(msg_value, 'utf-8')
     with open('encode.bin', "wb") as file:
@@ -150,4 +141,3 @@ if __name__ == '__main__':
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted)
         # deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
-    # shutting_down_instances()
