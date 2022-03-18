@@ -23,11 +23,11 @@ sqs_management_instance = SQSManagement
 # app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
 app_sqs_client = boto3.client('sqs',
                               region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
-                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
+                              aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
-s3_client = boto3.client('s3', 
+s3_client = boto3.client('s3',
                          region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
-                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
+                         aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
 response_queue_url = sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME)
 request_queue_url = sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME)
@@ -81,10 +81,11 @@ def store_image_to_s3(file_name, bucket_name, image_file):
         logging.error(e)
 
 
-# def write_to_file(image_name, result):
-#     with open(image_name, "rb") as f:
-#         f.write(bytes(result, 'utf8'))
-#         f.close()
+# Write to a binary file
+def write_to_file(image_name, result):
+    with open(image_name, "wb") as f:
+        f.write(bytes((result), 'utf8'))
+        f.close()
 
 
 def save_result_file_into_bucket(file_name, bucket_name, object_name):
@@ -132,10 +133,13 @@ if __name__ == '__main__':
         print("Storing Image to S3")
         store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, msg_filename_key)
         print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " Image File Name :" + msg_filename_key)
-        save_result_file_into_bucket(msg_filename_key, S3_OUTPUT_BUCKET, msg_filename_key)
         print("Saved to s3 output bucket")
         # removing the Image png File
         send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted_json)
-        # os.remove(msg_filename_key)
+        file_name_without_jpg = str(msg_filename_key.split('.')[0])
+        write_to_file(file_name_without_jpg, classified_predicted_result)
+        save_result_file_into_bucket(msg_filename_key, S3_OUTPUT_BUCKET, msg_filename_key)
         # Deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
+        os.remove(msg_filename_key)
+
