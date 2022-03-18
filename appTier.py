@@ -5,10 +5,9 @@ from botocore.exceptions import ClientError
 import logging
 import os
 import constants
-import EC2AutoScaling
 import SQSManagement
-import subprocess, json
-
+from subprocess import check_output
+import json
 
 # Constants
 S3_INPUT_BUCKET = constants.AWS_S3_INPUT_BUCKET_NAME
@@ -20,14 +19,15 @@ SQS_RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 # initialization and instantiations
 
 sqs_management_instance = SQSManagement
-ec2_auto_scale_instance = EC2AutoScaling
 
 # app_sqs_resource = boto3.resource("sqs", region_name=constants.REGION_NAME)
 app_sqs_client = boto3.client('sqs',
-                              region_name=constants.REGION_NAME)
+                              region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
+                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
 s3_client = boto3.client('s3', 
-                         region_name=constants.REGION_NAME)
+                         region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
+                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
 response_queue_url = sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME)
 request_queue_url = sqs_management_instance.get_queue_url(SQS_REQUEST_QUEUE_NAME)
@@ -56,7 +56,7 @@ def send_message_to_queue_response(queue_url, image_name):
     try:
         response = app_sqs_client.send_message(QueueUrl=queue_url,
                                                MessageBody=image_name)
-        print("send_message_to_queue_response :" + send_message_to_queue_response)
+        print("send_message_to_queue_response")
     except ClientError as e:
         logging.error(e)
         return False
@@ -82,10 +82,10 @@ def store_image_to_s3(file_name, bucket_name, image_file):
         logging.error(e)
 
 
-def write_to_file(image_name, result):
-    with open(image_name, "rb") as f:
-        f.write(bytes(result, 'utf8'))
-        f.close()
+# def write_to_file(image_name, result):
+#     with open(image_name, "rb") as f:
+#         f.write(bytes(result, 'utf8'))
+#         f.close()
 
 
 def save_result_file_into_bucket(file_name, bucket_name, object_name):
@@ -94,12 +94,6 @@ def save_result_file_into_bucket(file_name, bucket_name, object_name):
         response = s3_client.upload_file(file_name, bucket_name, object_name)
     except ClientError as e:
         logging.error(e)
-
-
-def shutting_down_instances():
-    instance_ids = ec2_auto_scale_instance.get_instances_by_state()
-    ec2_auto_scale_instance.stop_instances(instance_ids)
-    return None
 
 
 def get_image_after_decoding_base64(msg_filename_key, msg_value):
@@ -116,18 +110,24 @@ def get_image_after_decoding_base64(msg_filename_key, msg_value):
 
 
 # this one is to be checked and completed
-def get_output_from_classification(image_file_jpg):
-    # os.chdir(r"../")
-    classification_predicted_result = subprocess.check_output(["python3", "../face_recognition.py", image_file_jpg])
-    print("classification_predicted_result :" + str(classification_predicted_result))
-    return classification_predicted_result
+# def get_output_from_classification(image_file_jpg):
+#     # os.chdir(r"../")
+#     classification_predicted_result = subprocess.check_output(["python3", "../face_recognition.py", image_file_jpg])
+#     print("classification_predicted_result :" + str(classification_predicted_result))
+#     return classification_predicted_result
+
+def classify_image_sub(base64ImageStr, imageName):
+    base64Image = bytes(base64ImageStr, 'utf-8')
+    with open(imageName, "wb") as fh:
+        fh.write(base64.decodebytes(base64Image))
+    out = check_output(["python3", "-W ignore", "../face_recognition.py", imageName]).strip().decode('utf-8')
+    os.remove(imageName)
+    return out
 
 
 if __name__ == '__main__':
     while True:
         print("running_app_tier start")
-        if sqs_management_instance.numberOfMessagesInQueue() == 0:
-            break
         message = get_message(sqs_management_instance.get_queue_url())
         if message is None:
             break
@@ -136,18 +136,20 @@ if __name__ == '__main__':
         msg_filename_key = payload.get('key')
         print("msg_filename_key :" + msg_filename_key)
         msg_base64_encoded_value = payload.get('value')
-        print("msg_base64_encoded_value :" + msg_base64_encoded_value)
+        print("msg_base64_encoded_value :" + str(msg_base64_encoded_value))
         transient_binary_file = msg_filename_key
-        get_image_after_decoding_base64(msg_filename_key, msg_base64_encoded_value)
-        classified_predicted_result = "test" #get_output_from_classification(image_file_jpg)
+        # get_image_after_decoding_base64(msg_filename_key, msg_base64_encoded_value)
+        # classified_predicted_result = get_output_from_classification(msg_filename_key)
+        classified_predicted_result = classify_image_sub(msg_base64_encoded_value, msg_filename_key)
         key_value_pair_predicted = '({0}, {1})'.format(msg_filename_key, classified_predicted_result)
-        print("key_value_pair_predicted :" + key_value_pair_predicted)
+        print("key_value_pair_predicted :" + str(msg_filename_key) + str(classified_predicted_result))
+        print(key_value_pair_predicted)
         # write_to_file(transient_binary_file, key_value_pair_predicted)
         store_image_to_s3(msg_filename_key, S3_INPUT_BUCKET, msg_filename_key)
         print("S3_OUTPUT_BUCKET :" + S3_OUTPUT_BUCKET + " transient_binary_file :" +transient_binary_file)
         save_result_file_into_bucket(transient_binary_file, S3_OUTPUT_BUCKET, transient_binary_file)
+        print("saving to s3 buckets")
         os.remove(transient_binary_file)
-        send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), msg_filename_key)
+        send_message_to_queue_response(sqs_management_instance.get_queue_url(SQS_RESPONSE_QUEUE_NAME), key_value_pair_predicted)
         # deleting message after the message response is sent to queue
         delete_message_request(sqs_management_instance.get_queue_url(), message['ReceiptHandle'])
-    # shutting_down_instances()

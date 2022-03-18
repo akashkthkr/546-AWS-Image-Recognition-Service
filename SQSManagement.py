@@ -9,7 +9,8 @@ from botocore.exceptions import ClientError
 REQUEST_QUEUE_NAME = constants.AWS_SQS_REQUEST_QUEUE_NAME
 RESPONSE_QUEUE_NAME = constants.AWS_SQS_RESPONSE_QUEUE_NAME
 
-client = boto3.client('sqs', region_name=constants.REGION_NAME)
+client = boto3.client('sqs', region_name=constants.REGION_NAME,  aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
+                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
 def create_SQS_queue(SQS_QUEUE_NAME=REQUEST_QUEUE_NAME):
     try:
