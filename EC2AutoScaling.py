@@ -15,8 +15,10 @@ git pull
 python3 appTier.py
 """
 
-ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME)
-ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME)
+ec2_client = boto3.client('ec2', region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
+                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
+ec2_res = boto3.resource('ec2', region_name=constants.REGION_NAME, aws_access_key_id=constants.AWS_ACCESS_KEY_ID,
+                                                                 aws_secret_access_key=constants.AWS_ACCESS_KEY_SECRET)
 
 def create_key_pair():
     try:
