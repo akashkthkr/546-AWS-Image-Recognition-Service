@@ -69,9 +69,9 @@ def healthcheck():
   app.logger.debug('OK')
   return "200"
 
-if __name__ == '__main__':
-    app.logger.info(constants.STARTUP_BANNER)
-    app.logger.info(constants.STARTUP_BANNER_GROUP)
-    resultsThread = Thread(target=collect_response)
-    resultsThread.start()
-    app.run(host='0.0.0.0', debug=True, port=6060)
+
+app.logger.info(constants.STARTUP_BANNER)
+app.logger.info(constants.STARTUP_BANNER_GROUP)
+resultsThread = Thread(target=collect_response)
+resultsThread.start()
+app.run(host='0.0.0.0', debug=True, port=6060)
