@@ -37,9 +37,10 @@ async def collect_response():
 
 async def get_result(key):
     while True:
+        sleep(1)
         if key in result_dict:
             return result_dict[key]
-        await sleep(1)
+        
         
 @app.route('/classify-image', methods=['POST'])
 async def classify_image():
