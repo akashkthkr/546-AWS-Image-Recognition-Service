@@ -6,7 +6,7 @@ import constants
 from botocore.exceptions import ClientError
 
 logging.basicConfig(filename='ec2AutoScaling.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
-MAX_LIMIT_INSTANCES = 3
+MAX_LIMIT_INSTANCES = 19
 EC2_KEY_NAME = "ec2-key-pair"
 USER_DATA = f"""#!bin/bash
 yum update -y
@@ -95,13 +95,13 @@ def get_instances_by_state(state=['running']):
     ]
     instances = ec2_res.instances.filter(Filters=filters)
     for instance in instances:
-        print(instance.id)
+        print("running instance - " + instance.id)
         logging.debug(instance.id)
     return [instance.id for instance in instances]
 
 
 def auto_scale_instances():
-    queue_length = 3  # SQSManagement.numberOfMessagesInQueue()
+    queue_length = SQSManagement.numberOfMessagesInQueue()
     logging.debug("Request queue length: %s", queue_length)
 
     if queue_length == 0:
