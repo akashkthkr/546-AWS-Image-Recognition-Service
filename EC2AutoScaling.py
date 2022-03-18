@@ -7,7 +7,7 @@ from botocore.exceptions import ClientError
 from random import randrange
 
 logging.basicConfig(filename='ec2AutoScaling.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
-MAX_LIMIT_INSTANCES = 3
+MAX_LIMIT_INSTANCES = 19
 EC2_KEY_NAME = "ec2-key-pair"
 USER_DATA = f"""#!bin/bash
 cd /home/ec2-user/546_AWS_Image_Recognition_Service
