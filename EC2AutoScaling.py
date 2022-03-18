@@ -141,8 +141,9 @@ def auto_scale_instances():
             # stop half of the instances
             return
 
-# while True:
-#     logging.debug("*********** Started EC2 auto scaling according to queue length**************")
-#     auto_scale_instances()
-#     get_instances_by_state()
-#     time.sleep(10)
+while True:
+    logging.info(constants.STARTUP_BANNER)
+    logging.info(constants.STARTUP_BANNER_GROUP)
+    logging.debug("*********** Started EC2 auto scaling according to queue length**************")
+    auto_scale_instances()
+    time.sleep(10)
