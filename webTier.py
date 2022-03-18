@@ -43,7 +43,8 @@ async def get_result(key):
     while True:
         await asyncio.sleep(1)
         if key in result_dict:
-            return result_dict[key]
+            output_to_be_returned = '({0}, {1})'.format(key, result_dict[key])
+            return output_to_be_returned
         
         
 @app.route('/classify-image', methods=['POST'])
