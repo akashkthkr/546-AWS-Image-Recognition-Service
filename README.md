@@ -2,16 +2,18 @@
 Our cloud app will provide a face recognition service to users, by using cloud resources to perform deep learning on images provided by the users. The deep learning model will be provided as a service. This application will put a layer for the model to work.
 
 Install Dependecies -
-/#!/bin/bash
 
-/#Download get-pip to current directory. It won't install anything, as of now
+!/bin/bash
+
+Download get-pip to current directory. It won't install anything, as of now
 
 curl -O https://bootstrap.pypa.io/get-pip.py
 
-/#Use python3.6 to install pip
+Use python3.6 to install pip
 
 python3 get-pip.py
-/#this will install pip3 and pip3.6
+
+This will install pip3 and pip3.6
 
 pip3 install -r requirements.txt
 
@@ -35,22 +37,22 @@ AWS_ACCESS_KEY_ID = "AAAAAAAAAAAAAAA"
 
 AWS_ACCESS_KEY_SECRET = "BBBBBBBBBBBBBBBB"
 
-We have also loaded the script at startup of the instance on AMI load:
+### We have also loaded the script at startup of the instance on AMI load:
 
-/#!/bin/bash
+!/bin/bash
 
 sudo yum update -y
 
 sudo yum install git -y
 
-echo export AWS_ACCESS_KEY_ID="AKIARS5GD4KS3VDDCZ6D" >> /etc/profile
+echo export AWS_ACCESS_KEY_ID="AAAAAAAAAAAAAAA" >> /etc/profile
 
-echo export AWS_SECRET_ACCESS_KEY="JNvan5FhImoUqePK5Dph2yaAoRDebpCZF++drB5+" >> /etc/profile
+echo export AWS_SECRET_ACCESS_KEY="BBBBBBBBBBBBBBBB"" >> /etc/profile
 
 git clone https://token@github.com/akashkthkr/546_AWS_Image_Recognition_Service.git
 
 
-### Team Members:
+### Team Members Group 11:
 Akash Kant (akant1)
 
 Ayush Kalani (akalani2)
