@@ -17,12 +17,14 @@ This will install pip3 and pip3.6
 
 pip3 install -r requirements.txt
 
-### Web Tier IP and SSH Details
+## AWS Details
+
+### SSH Details Dummy
 
 ssh -i "Akash_key.pem" ec2-user@ec2-3-86-234-121.compute-1.amazonaws.com
 
 ### Resources Used in AWS as Naming:
-
+```bash
 AWS_S3_INPUT_BUCKET_NAME = "cc-546-grp-11-input-bucket"
 
 AWS_S3_OUTPUT_BUCKET_NAME = "cc-546-grp-11-output-bucket"
@@ -36,20 +38,19 @@ REGION_NAME = "us-east-1"
 AWS_ACCESS_KEY_ID = "AAAAAAAAAAAAAAA"
 
 AWS_ACCESS_KEY_SECRET = "BBBBBBBBBBBBBBBB"
+```
 
 ### We have also loaded the script at startup of the instance on AMI load:
 
-!/bin/bash
-
+```bash
 sudo yum update -y
-
 sudo yum install git -y
-
 echo export AWS_ACCESS_KEY_ID="AAAAAAAAAAAAAAA" >> /etc/profile
-
 echo export AWS_SECRET_ACCESS_KEY="BBBBBBBBBBBBBBBB"" >> /etc/profile
+git clone https://token@github.com/akashkthkr/CSE546-Real-Time-Face-Recognition-From-Raspberry-PI-Video
+.git
+```
 
-git clone https://token@github.com/akashkthkr/546_AWS_Image_Recognition_Service.git
 
 
 
