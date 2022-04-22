@@ -1,5 +1,5 @@
 # 546_AWS_Image_Recognition_Service 
-[![License](https://img.shields.io/github/license/qcenergy/qudra.svg?style=popout-square)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/github/license/akashkthkr/546_AWS_Image_Recognition_Service.svg?style=popout-square)](https://opensource.org/licenses/Apache-2.0)
 
 Our cloud app will provide a face recognition service to users, by using cloud resources to perform deep learning on images provided by the users. The deep learning model will be provided as a service. This application will put a layer for the model to work.
 
