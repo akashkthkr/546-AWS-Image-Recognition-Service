@@ -26,7 +26,7 @@ pip3 install -r requirements.txt
 ssh -i "Akash_key.pem" ec2-user@ec2-3-86-234-121.compute-1.amazonaws.com
 
 ### Resources Used in AWS as Naming:
-```bash
+```python
 AWS_S3_INPUT_BUCKET_NAME = "cc-546-grp-11-input-bucket"
 
 AWS_S3_OUTPUT_BUCKET_NAME = "cc-546-grp-11-output-bucket"
