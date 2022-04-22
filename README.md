@@ -52,10 +52,13 @@ echo export AWS_SECRET_ACCESS_KEY="BBBBBBBBBBBBBBBB"" >> /etc/profile
 git clone https://token@github.com/akashkthkr/546_AWS_Image_Recognition_Service.git
 
 
+
+## Acknowledgements
 ### Team Members Group 11:
-Akash Kant (akant1)
+[Akash Kant](https://github.com/akashkthkr), (akant1)
 
-Ayush Kalani (akalani2)
+[Ayush Kalani](https://github.com/ayushkalani), (akalani2)
 
-Nakul Vaidya (nvaidya7)
+[Nakul Vaidya](https://github.com/NakulVaidya), (nvaidya7)
+
 
