@@ -49,8 +49,7 @@ sudo yum update -y
 sudo yum install git -y
 echo export AWS_ACCESS_KEY_ID="AAAAAAAAAAAAAAA" >> /etc/profile
 echo export AWS_SECRET_ACCESS_KEY="BBBBBBBBBBBBBBBB"" >> /etc/profile
-git clone https://token@github.com/akashkthkr/CSE546-Real-Time-Face-Recognition-From-Raspberry-PI-Video
-.git
+git clone https://token@github.com/akashkthkr/546-AWS-Image-Recognition-Service.git
 ```
 
 
